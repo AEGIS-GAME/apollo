@@ -1,17 +1,5 @@
 {
   "name": "my-app",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "bunx --bun vite --port 3000",
-    "start": "bunx --bun vite --port 3000",
-    "build": "bunx --bun vite build && tsc",
-    "serve": "bunx --bun vite preview",
-    "test": "bunx --bun vitest run",
-    "format": "bunx --bun biome format",
-    "lint": "bunx --bun biome lint",
-    "check": "bunx --bun biome check"
-  },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-devtools": "^0.2.2",
@@ -35,5 +23,17 @@
     "vite": "^6.3.5",
     "vitest": "^3.0.5",
     "web-vitals": "^4.2.4"
-  }
+  },
+  "private": true,
+  "scripts": {
+    "dev": "bunx --bun vite --port 3000",
+    "start": "bunx --bun vite --port 3000",
+    "build": "bunx --bun vite build && tsc",
+    "serve": "bunx --bun vite preview",
+    "test": "bunx --bun vitest run",
+    "format": "bunx --bun biome format",
+    "lint": "bunx --bun biome lint",
+    "check": "bunx --bun biome check"
+  },
+  "type": "module"
 }
