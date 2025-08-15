@@ -7,7 +7,7 @@ export const Route = createFileRoute("/")({
 });
 
 async function uploadFile(formData: FormData) {
-  const res = await fetch("http://localhost:8080/api/upload", {
+  const res = await fetch("http://localhost:8080/match/run", {
     method: "POST",
     body: formData,
   });
