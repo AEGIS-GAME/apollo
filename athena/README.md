@@ -19,7 +19,11 @@ You can get started locally using Docker Compose. This will spin up both the fro
 cd athena
 ```
 
-2. Start the services:
+2. Set up the backend:
+
+Follow the steps in the [backend setup guide](https://github.com/AEGIS-GAME/apollo/tree/main/athena/backend#setup).
+
+3. Start the services:
 
 ```bash
 docker compose up -d

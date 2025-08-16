@@ -8,12 +8,9 @@ import (
 	"github.com/AEGIS-GAME/apollo/athena/backend/middleware"
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	godotenv.Load(".env.development")
-
 	db.InitDB()
 	defer db.DB.Close()
 
