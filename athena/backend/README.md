@@ -52,6 +52,12 @@ go run cmd/migrate/main.go
 go run cmd/server/main.go
 ```
 
+or use `air` for live reload:
+
+```bash
+air -build.cmd "go run ./cmd/server"
+```
+
 The API will be available at `http://localhost:8000`
 
 ## API Endpoints
