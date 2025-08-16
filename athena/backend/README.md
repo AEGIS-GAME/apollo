@@ -24,7 +24,7 @@ but additional endpoints will be added in the future.
 ### Prerequisites
 
 - Go 1.25+
-- PostgreSQL or SQLite for local development
+- Postgres or SQLite for local development
 
 ### Steps
 
@@ -40,13 +40,32 @@ cd athena/backend
 go mod tidy
 ```
 
-3. Run the database migration script to create tables:
+3. Install `golang-migrate`
+
+We use `golang-migrate` for database migrations.
+Install it with support for both SQLite and Postgres:
 
 ```bash
-go run cmd/migrate/main.go
+go install -tags 'sqlite3 sqlite postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 ```
 
-4. Start the server:
+This will install the `migrate` CLI into yout `$GOBIN` (usually `~/go/bin`).
+
+4. Run the database migrations:
+
+For SQLite (development):
+
+```bash
+migrate -path migrations -database sqlite3://dev.db -verbose up
+```
+
+If you need to reset your local DB completely (drops all tables):
+
+```bash
+migrate -path migrations -database sqlite3://dev.db -verbose down
+```
+
+5. Start the server:
 
 ```bash
 go run cmd/server/main.go
