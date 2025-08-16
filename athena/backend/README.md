@@ -99,8 +99,13 @@ The API will be available at `http://localhost:8000`
 
 ```json
 {
-  "access_token": "<jwt_token>"
-  "refresh_token": "<jwt_token>"
+  "access_token": "<new_jwt_token>",
+  "refresh_token": "<new_jwt_token>",
+  "user": {
+    "id": "uuid-here",
+    "username": "alice",
+    "is_admin": false
+  }
 }
 ```
 
@@ -121,8 +126,39 @@ The API will be available at `http://localhost:8000`
 
 ```json
 {
-  "access_token": "<jwt_token>"
-  "refresh_token": "<jwt_token>"
+  "access_token": "<new_jwt_token>",
+  "refresh_token": "<new_jwt_token>",
+  "user": {
+    "id": "uuid-here",
+    "username": "alice",
+    "is_admin": false
+  }
+}
+```
+
+#### Refresh Access Token
+
+- **Endpoint:** `GET /api/users/refresh`
+- **Description:** Uses a valid refresh token to issue a new access token and a new refresh token.
+- **Request Example:**
+
+```json
+{
+  "refresh_token": "<refresh_token_here>"
+}
+```
+
+- **Response Example:**
+
+```json
+{
+  "access_token": "<new_jwt_access_token>",
+  "refresh_token": "<new_jwt_refresh_token>",
+  "user": {
+    "id": "uuid-here",
+    "username": "alice",
+    "is_admin": false
+  }
 }
 ```
 
