@@ -38,10 +38,10 @@ This will:
 
 ### Healthcheck
 
-The backend exposes a `/status` endpoint to verify it’s running:
+The backend exposes a `/health` endpoint to verify it’s running:
 
 ```bash
-curl http://localhost:8000/status
+curl http://localhost:8000/health
 ```
 
 ### View Logs

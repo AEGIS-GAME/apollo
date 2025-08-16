@@ -86,7 +86,7 @@ The API will be available at `http://localhost:8000`
 #### Register a New User
 
 - **Endpoint:** `POST /api/users/register`
-- **Description:** Creates a new user account.
+- **Description:** Creates a new user account and returns an access and refresh token.
 - **Request Example:**
 ```json
 {
@@ -99,14 +99,15 @@ The API will be available at `http://localhost:8000`
 
 ```json
 {
-  "token": "<jwt_token>"
+  "access_token": "<jwt_token>"
+  "refresh_token": "<jwt_token>"
 }
 ```
 
 #### Login
 
 - **Endpoint:** `POST /api/users/login`
-- **Description:** Authenticates a user and returns an authentication token.
+- **Description:** Authenticates a user and returns an access and refresh token.
 - **Request Example:**
 
 ```json
@@ -120,7 +121,8 @@ The API will be available at `http://localhost:8000`
 
 ```json
 {
-  "token": "<jwt_token>"
+  "access_token": "<jwt_token>"
+  "refresh_token": "<jwt_token>"
 }
 ```
 
