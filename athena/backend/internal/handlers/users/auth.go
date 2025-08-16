@@ -32,6 +32,8 @@ var (
 	ErrUsernameAlreadyTaken = errors.New("username already taken")
 	ErrInvalidUsername      = errors.New("invalid username")
 	ErrWeakPassword         = errors.New("password too weak")
+	ErrMissingRefreshToken  = errors.New("missing refresh token")
+	ErrInvalidToken         = errors.New("invalid token")
 )
 
 type UserInfo struct {
@@ -173,6 +175,65 @@ func LoginHandler(dbConn *sql.DB, cfg *config.Config) http.HandlerFunc {
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+			handleAuthError(w, ErrInvalidCredentials)
+			return
+		}
+
+		tokens, err := getTokenPair(user.ID, cfg.JWTSecret)
+		if err != nil {
+			handleAuthError(w, err)
+			return
+		}
+
+		if err := respondWithAuth(w, tokens, user); err != nil {
+			handleAuthError(w, err)
+		}
+	}
+}
+
+func RefreshHandler(dbConn *sql.DB, cfg *config.Config) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			RefreshToken string `json:"refresh_token"`
+		}
+
+		if err := decodeJSON(r, &req); err != nil || req.RefreshToken == "" {
+			handleAuthError(w, errors.New("missing refresh token"))
+			return
+		}
+
+		token, err := jwt.Parse(req.RefreshToken, func(t *jwt.Token) (any, error) {
+			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, ErrInvalidToken
+			}
+			return []byte(cfg.JWTSecret), nil
+		})
+
+		if err != nil || !token.Valid {
+			handleAuthError(w, ErrInvalidCredentials)
+			return
+		}
+
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok || claims["type"] != RefreshTokenType {
+			handleAuthError(w, ErrInvalidCredentials)
+			return
+		}
+
+		userIDStr, ok := claims["user_id"].(string)
+		if !ok {
+			handleAuthError(w, ErrInvalidCredentials)
+			return
+		}
+
+		userID, err := uuid.Parse(userIDStr)
+		if err != nil {
+			handleAuthError(w, ErrInvalidCredentials)
+			return
+		}
+
+		user, err := db.GetUserByID(dbConn, userID)
+		if err != nil || user == nil {
 			handleAuthError(w, ErrInvalidCredentials)
 			return
 		}
