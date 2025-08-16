@@ -11,4 +11,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["air", "-build.cmd", "go run ./cmd"]
+CMD ["air", "-build.cmd", "go run ./cmd/server"]
