@@ -12,7 +12,7 @@ func UsersRouter(db *sql.DB, cfg *config.Config) chi.Router {
 	r := chi.NewRouter()
 
 	r.Post("/register", users.RegisterHandler(db, cfg))
-	// r.Post("/login", users.RegisterHandler(db))
+	r.Post("/login", users.LoginHandler(db, cfg))
 
 	return r
 }

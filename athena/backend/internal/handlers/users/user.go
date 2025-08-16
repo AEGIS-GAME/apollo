@@ -16,19 +16,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type RegisterRequest struct {
+type AuthRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-type RegisterResponse struct {
+type AuthResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
 
 func RegisterHandler(dbConn *sql.DB, cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req RegisterRequest
+		var req AuthRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			shared.RespondWithError(w, http.StatusBadRequest, "invalid request")
 			return
@@ -70,7 +70,44 @@ func RegisterHandler(dbConn *sql.DB, cfg *config.Config) http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(RegisterResponse{
+		json.NewEncoder(w).Encode(AuthResponse{
+			AccessToken:  tokens.AccessToken,
+			RefreshToken: tokens.RefreshToken,
+		})
+	}
+}
+
+func LoginHandler(dbConn *sql.DB, cfg *config.Config) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req AuthRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			shared.RespondWithError(w, http.StatusBadRequest, "invalid request")
+			return
+		}
+
+		user, err := db.GetUserByUsername(dbConn, req.Username)
+		if err != nil {
+			shared.RespondWithError(w, http.StatusInternalServerError, "server error")
+			return
+		}
+		if user == nil {
+			shared.RespondWithError(w, http.StatusConflict, "invalid credentials")
+			return
+		}
+
+		if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+			shared.RespondWithError(w, http.StatusUnauthorized, "invalid credentials")
+			return
+		}
+
+		tokens, err := getTokenPair(user.ID, cfg.JWTSecret)
+		if err != nil {
+			shared.RespondWithError(w, http.StatusInternalServerError, "server error")
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(AuthResponse{
 			AccessToken:  tokens.AccessToken,
 			RefreshToken: tokens.RefreshToken,
 		})
@@ -112,5 +149,4 @@ func getTokenPair(userID uuid.UUID, jwtSecret string) (*TokenPair, error) {
 	}, nil
 }
 
-// Optional custom error
 var ErrMissingJWTSecret = errors.New("JWT_SECRET environment variable not set")
