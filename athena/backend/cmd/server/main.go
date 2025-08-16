@@ -4,32 +4,26 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/AEGIS-GAME/apollo/athena/backend/internal/config"
 	"github.com/AEGIS-GAME/apollo/athena/backend/internal/db"
-	"github.com/AEGIS-GAME/apollo/athena/backend/middleware"
+	"github.com/AEGIS-GAME/apollo/athena/backend/internal/routes"
 	"github.com/go-chi/chi/v5"
-	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
-	db.InitDB()
+	cfg := config.Load()
+	db.InitDB(cfg)
 	defer db.DB.Close()
 
 	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
 
-	r.Use(chiMiddleware.Logger)
-	r.Use(chiMiddleware.Recoverer)
+	apiRouter := routes.APIRouter(db.DB, cfg)
 
-	// Unprotected routes
-	r.Group(func(r chi.Router) {
-		r.Get("/status", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("ok"))
-		})
-	})
-
-	// Protected routes
-	r.Group(func(r chi.Router) {
-		r.Use(middleware.AuthMiddleware)
-	})
+	r.Mount("/api", apiRouter)
+	r.Mount("/health", routes.HealthRouter())
 
 	log.Printf("Server listening on :8000")
 	http.ListenAndServe(":8000", r)

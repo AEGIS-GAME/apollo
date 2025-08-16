@@ -11,9 +11,7 @@ import (
 
 var DB *sql.DB
 
-func InitDB() {
-	cfg := config.Load()
-
+func InitDB(cfg *config.Config) {
 	var err error
 	DB, err = sql.Open(cfg.DBDriver, cfg.DBDsn)
 	if err != nil {
