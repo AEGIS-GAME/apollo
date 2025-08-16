@@ -11,10 +11,11 @@ but additional endpoints will be added in the future.
       - [Register a New User](#register-a-new-user)
       - [Login](#login)
       - [Get Current User](#get-current-user)
+      - [Delete User](#delete-user)
     - [Admin Endpoints](#admin-endpoints)
       - [List All Users](#list-all-users)
       - [Promote User to Admin](#promote-user-to-admin)
-      - [Deactivate User](#deactivate-user)
+      - [Delete User](#admin-delete-user)
 
 ---
 
