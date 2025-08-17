@@ -23,6 +23,7 @@ const (
 	RefreshTokenDuration = 7 * 24 * time.Hour
 	RefreshTokenType     = "refresh"
 	MinPasswordLength    = 8
+	MinUsernameLength    = 3
 	MaxUsernameLength    = 50
 )
 
@@ -97,7 +98,7 @@ func validateUsername(username string) error {
 	var usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
 	username = strings.TrimSpace(username)
 
-	if len(username) == 0 || len(username) > MaxUsernameLength {
+	if len(username) == 0 || len(username) < MinUsernameLength || len(username) > MaxUsernameLength {
 		return ErrInvalidUsername
 	}
 
