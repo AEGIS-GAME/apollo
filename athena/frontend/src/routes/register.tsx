@@ -7,8 +7,10 @@ export const Route = createFileRoute("/register")({
 
 function RouteComponent() {
   return (
-    <div>
-      <RegisterForm />
+    <div className="min-h-screen flex items-center justify-center bg-bg px-4">
+      <div className="w-full max-w-md">
+        <RegisterForm />
+      </div>
     </div>
-  )
+  );
 }
