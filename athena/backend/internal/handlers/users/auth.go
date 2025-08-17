@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AEGIS-GAME/apollo/athena/backend/internal/config"
 	"github.com/AEGIS-GAME/apollo/athena/backend/internal/db"
 	"github.com/AEGIS-GAME/apollo/athena/backend/internal/models"
+	"github.com/AEGIS-GAME/apollo/athena/backend/middleware"
 	"github.com/AEGIS-GAME/apollo/athena/backend/shared"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -83,8 +83,9 @@ func respondWithAuth(w http.ResponseWriter, tokens *TokenPair, user *models.User
 		Username: user.Username,
 		IsAdmin:  user.IsAdmin,
 	}
-	w.Header().Set("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(response)
+
+	shared.RespondWithJSON(w, http.StatusOK, response)
+	return nil
 }
 
 func validatePassword(password string) error {
@@ -108,38 +109,39 @@ func validateUsername(username string) error {
 	return nil
 }
 
-func RegisterHandler(dbConn *sql.DB, cfg *config.Config) http.HandlerFunc {
+func RegisterHandler(dbConn *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cfg := middleware.GetConfig(r)
 		var req AuthRequest
 		if err := decodeJSON(r, &req); err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 			return
 		}
 
 		if err := validateUsername(req.Username); err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 			return
 		}
 
 		if err := validatePassword(req.Password); err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 			return
 		}
 
 		existingUser, err := db.GetUserByUsername(dbConn, req.Username)
 		if err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 			return
 		}
 
 		if existingUser != nil {
-			handleAuthError(w, ErrUsernameAlreadyTaken)
+			handleError(w, ErrUsernameAlreadyTaken)
 			return
 		}
 
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 			return
 		}
 
@@ -151,65 +153,68 @@ func RegisterHandler(dbConn *sql.DB, cfg *config.Config) http.HandlerFunc {
 		}
 
 		if err := db.CreateUser(dbConn, user); err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 			return
 		}
 
 		tokens, err := getTokenPair(user.ID, cfg.JWTSecret)
 		if err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 			return
 		}
 
 		if err := respondWithAuth(w, tokens, user); err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 		}
 	}
 }
 
-func LoginHandler(dbConn *sql.DB, cfg *config.Config) http.HandlerFunc {
+func LoginHandler(dbConn *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		cfg := middleware.GetConfig(r)
 		var req AuthRequest
 		if err := decodeJSON(r, &req); err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 			return
 		}
 
 		user, err := db.GetUserByUsername(dbConn, req.Username)
 		if err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 			return
 		}
 		if user == nil {
-			handleAuthError(w, ErrInvalidCredentials)
+			handleError(w, ErrInvalidCredentials)
 			return
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
-			handleAuthError(w, ErrInvalidCredentials)
+			handleError(w, ErrInvalidCredentials)
 			return
 		}
 
 		tokens, err := getTokenPair(user.ID, cfg.JWTSecret)
 		if err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 			return
 		}
 
 		if err := respondWithAuth(w, tokens, user); err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 		}
 	}
 }
 
-func RefreshHandler(dbConn *sql.DB, cfg *config.Config) http.HandlerFunc {
+func RefreshHandler(dbConn *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req struct {
 			RefreshToken string `json:"refresh_token"`
 		}
 
+		cfg := middleware.GetConfig(r)
+
 		if err := decodeJSON(r, &req); err != nil || req.RefreshToken == "" {
-			handleAuthError(w, errors.New("missing refresh token"))
+			handleError(w, errors.New("missing refresh token"))
 			return
 		}
 
@@ -221,42 +226,42 @@ func RefreshHandler(dbConn *sql.DB, cfg *config.Config) http.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			handleAuthError(w, ErrInvalidCredentials)
+			handleError(w, ErrInvalidCredentials)
 			return
 		}
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok || claims["type"] != RefreshTokenType {
-			handleAuthError(w, ErrInvalidCredentials)
+			handleError(w, ErrInvalidCredentials)
 			return
 		}
 
 		userIDStr, ok := claims["user_id"].(string)
 		if !ok {
-			handleAuthError(w, ErrInvalidCredentials)
+			handleError(w, ErrInvalidCredentials)
 			return
 		}
 
 		userID, err := uuid.Parse(userIDStr)
 		if err != nil {
-			handleAuthError(w, ErrInvalidCredentials)
+			handleError(w, ErrInvalidCredentials)
 			return
 		}
 
 		user, err := db.GetUserByID(dbConn, userID)
 		if err != nil || user == nil {
-			handleAuthError(w, ErrInvalidCredentials)
+			handleError(w, ErrInvalidCredentials)
 			return
 		}
 
 		tokens, err := getTokenPair(user.ID, cfg.JWTSecret)
 		if err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 			return
 		}
 
 		if err := respondWithAuth(w, tokens, user); err != nil {
-			handleAuthError(w, err)
+			handleError(w, err)
 		}
 	}
 }
@@ -298,7 +303,7 @@ func generateToken(userID uuid.UUID, jwtSecret string, duration time.Duration, t
 	return token.SignedString([]byte(jwtSecret))
 }
 
-func handleAuthError(w http.ResponseWriter, err error) {
+func handleError(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Is(err, ErrInvalidCredentials):
 		shared.RespondWithError(w, http.StatusUnauthorized, "invalid credentials")

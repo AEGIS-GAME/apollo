@@ -1,11 +1,19 @@
 package config
 
-import "os"
+import (
+	"database/sql"
+	"os"
+)
 
 type Config struct {
 	DBDriver  string
 	DBDsn     string
 	JWTSecret string
+}
+
+type App struct {
+	Config *Config
+	DB     *sql.DB
 }
 
 func Load() *Config {

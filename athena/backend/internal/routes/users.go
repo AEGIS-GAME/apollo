@@ -1,19 +1,25 @@
 package routes
 
 import (
-	"database/sql"
-
 	"github.com/AEGIS-GAME/apollo/athena/backend/internal/config"
 	"github.com/AEGIS-GAME/apollo/athena/backend/internal/handlers/users"
+	"github.com/AEGIS-GAME/apollo/athena/backend/middleware"
 	"github.com/go-chi/chi/v5"
 )
 
-func UsersRouter(db *sql.DB, cfg *config.Config) chi.Router {
+func UsersRouter(app *config.App) chi.Router {
 	r := chi.NewRouter()
 
-	r.Post("/register", users.RegisterHandler(db, cfg))
-	r.Post("/login", users.LoginHandler(db, cfg))
-	r.Post("/refresh", users.RefreshHandler(db, cfg))
+	r.Use(middleware.WithConfig(app.Config))
+
+	r.Post("/register", users.RegisterHandler(app.DB))
+	r.Post("/login", users.LoginHandler(app.DB))
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.AuthMiddleware)
+		r.Get("/me", users.GetMeHandler(app.DB))
+		r.Delete("/me", users.DeleteMeHandler(app.DB))
+		r.Post("/refresh", users.RefreshHandler(app.DB))
+	})
 
 	return r
 }
