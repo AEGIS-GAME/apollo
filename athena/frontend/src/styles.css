@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Lexend:wght@100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Lexend:wght@100..900&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -6,26 +6,24 @@
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --color-bg: #f5f5f5;
-  --color-card: #e0e0e0;
-  --color-border: #b0bec5;
-  --color-fg-muted: #90a4ae;
-  --color-fg: #607d8b;
+  --color-fg: #0a0a0a;
+  --color-fg-muted: #737373;
 
-  --color-accent: #3f51b5;
-  --color-accent-hover: #303f9f;
-  --color-accent-muted: #c5cae9;
+  --color-primary: #abb8c0;
+  --color-primary-hover: #9fb0b8;
+  --color-primary-muted: #dce2e5;
 
   --color-success: #4caf50;
-  --color-success-bg: #e8f5e9;
+  --color-success-hover: #3d8b40;
 
   --color-warning: #ffc107;
-  --color-warning-bg: #fff8e1;
+  --color-warning-hover: #d39e00;
 
   --color-danger: #f44336;
-  --color-danger-bg: #ffebee;
+  --color-danger-hover: #ea1c0d;
 
   --color-info: #2196f3;
-  --color-info-bg: #e3f2fd;
+  --color-info-hover: #0c7cd5;
 
   --color-link: #1565c0;
   --color-link-hover: #0d47a1;

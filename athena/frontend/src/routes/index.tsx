@@ -6,9 +6,6 @@ export const Route = createFileRoute("/")({
 
 function App() {
   return (
-    <div>
-      Hello World
-      <p></p>
-    </div>
+    <div className="w-full h-screen flex items-center justify-center"></div>
   )
 }
