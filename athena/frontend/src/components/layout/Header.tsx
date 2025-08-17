@@ -2,7 +2,7 @@ import { Link, useMatchRoute } from "@tanstack/react-router"
 import { Route as loginRoute } from "@/routes/login"
 import { Route as registerRoute } from "@/routes/register"
 import { Route as homeRoute } from "@/routes/index"
-import Button from "./ui/Button"
+import Button from "../ui/Button"
 
 export default function Header(): React.JSX.Element | null {
   const hideHeaderRoutes = [loginRoute.to, registerRoute.to]

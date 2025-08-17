@@ -1,4 +1,4 @@
-import Header from "@/components/Header"
+import Header from "@/components/layout/Header"
 import { TanstackDevtools } from "@tanstack/react-devtools"
 import { Outlet, createRootRoute } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
