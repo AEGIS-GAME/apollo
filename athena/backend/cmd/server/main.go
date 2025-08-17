@@ -17,6 +17,11 @@ func main() {
 	db.InitDB(cfg)
 	defer db.DB.Close()
 
+	app := &config.App{
+		Config: cfg,
+		DB:     db.DB,
+	}
+
 	r := chi.NewRouter()
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"},
@@ -29,7 +34,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	apiRouter := routes.APIRouter(db.DB, cfg)
+	apiRouter := routes.APIRouter(app)
 
 	r.Mount("/api", apiRouter)
 	r.Mount("/health", routes.HealthRouter())
