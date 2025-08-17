@@ -47,12 +47,6 @@ type AuthRequest struct {
 	Password string `json:"password"`
 }
 
-type AuthResponse struct {
-	AccessToken  string   `json:"access_token"`
-	RefreshToken string   `json:"refresh_token"`
-	User         UserInfo `json:"user"`
-}
-
 type TokenPair struct {
 	AccessToken  string
 	RefreshToken string
@@ -63,14 +57,30 @@ func decodeJSON(r *http.Request, dst any) error {
 }
 
 func respondWithAuth(w http.ResponseWriter, tokens *TokenPair, user *models.User) error {
-	response := AuthResponse{
-		AccessToken:  tokens.AccessToken,
-		RefreshToken: tokens.RefreshToken,
-		User: UserInfo{
-			ID:       user.ID,
-			Username: user.Username,
-			IsAdmin:  user.IsAdmin,
-		},
+	http.SetCookie(w, &http.Cookie{
+		Name:     "access_token",
+		Value:    tokens.AccessToken,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		Path:     "/",
+		MaxAge:   int(AccessTokenDuration.Seconds()),
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    tokens.RefreshToken,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		Path:     "/",
+		MaxAge:   int(RefreshTokenDuration.Seconds()),
+	})
+
+	response := UserInfo{
+		ID:       user.ID,
+		Username: user.Username,
+		IsAdmin:  user.IsAdmin,
 	}
 	w.Header().Set("Content-Type", "application/json")
 	return json.NewEncoder(w).Encode(response)

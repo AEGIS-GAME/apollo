@@ -91,13 +91,21 @@ The API will be available at `http://localhost:8000`.
 
 ## API Endpoints
 
+> [!NOTE]
+> All authentication is handled via **HttpOnly cookies** (`access_token` and `refresh_token`).
+> Clients do not need to manually send `Authorization: Bearer` headers.
+> Make sure to include `credentials: "include"` on all fetch requests from the frontend so cookies are sent automatically.
+
+
 ### User API
 
 #### Register a New User
 
 - **Endpoint:** `POST /api/users/register`
-- **Description:** Creates a new user account and returns an access and refresh token.
+- **Description:** Creates a new user account. Sets authentication cookies (`access_token` and `refresh_token`)
+and returns user info.
 - **Request Example:**
+
 ```json
 {
   "username": "alice",
@@ -109,20 +117,17 @@ The API will be available at `http://localhost:8000`.
 
 ```json
 {
-  "access_token": "<new_jwt_token>",
-  "refresh_token": "<new_jwt_token>",
-  "user": {
-    "id": "uuid-here",
-    "username": "alice",
-    "is_admin": false
-  }
+  "id": "uuid-here",
+  "username": "alice",
+  "is_admin": false
 }
 ```
 
 #### Login
 
 - **Endpoint:** `POST /api/users/login`
-- **Description:** Authenticates a user and returns an access and refresh token.
+- **Description:** Authenticates a user. Sets authentication cookies (`access_token` and `refresh_token`)
+and returns user info.
 - **Request Example:**
 
 ```json
@@ -136,52 +141,35 @@ The API will be available at `http://localhost:8000`.
 
 ```json
 {
-  "access_token": "<new_jwt_token>",
-  "refresh_token": "<new_jwt_token>",
-  "user": {
-    "id": "uuid-here",
-    "username": "alice",
-    "is_admin": false
-  }
+  "id": "uuid-here",
+  "username": "alice",
+  "is_admin": false
 }
 ```
 
 #### Refresh Access Token
 
 - **Endpoint:** `GET /api/users/refresh`
-- **Description:** Uses a valid refresh token to issue a new access token and a new refresh token.
-- **Request Example:**
-
-```json
-{
-  "refresh_token": "<refresh_token_here>"
-}
-```
-
+- **Description:** Uses the refresh token cookie to issue new cookies (`access_token` and `refresh_token`). Returns user info.
 - **Response Example:**
 
 ```json
 {
-  "access_token": "<new_jwt_access_token>",
-  "refresh_token": "<new_jwt_refresh_token>",
-  "user": {
-    "id": "uuid-here",
-    "username": "alice",
-    "is_admin": false
-  }
+  "id": "uuid-here",
+  "username": "alice",
+  "is_admin": false
 }
 ```
 
 #### Get Current User
 
 - **Endpoint:** `GET /api/users/me`
-- **Description:** Returns details of the currently authenticated user.
-- **Headers:** `Authorization: Bearer <token>`
+- **Description:** Returns details of the currently authenticated user. Authentication is handled via cookies.
 - **Response Example:**
 
 ```json
 {
-  "id": 1,
+  "id": "uuid-here",
   "username": "alice",
   "is_admin": false
 }
@@ -190,8 +178,7 @@ The API will be available at `http://localhost:8000`.
 #### Delete Account
 
 - **Endpoint:** `DELETE /api/users/me`
-- **Description:** Permanently deletes the authenticated user’s account.
-- **Headers:** `Authorization: Bearer <token>`
+- **Description:** Permanently deletes the authenticated user’s account. Requires authentication cookies.
 - **Response Example:**
 
 ```json
@@ -200,14 +187,12 @@ The API will be available at `http://localhost:8000`.
 }
 ```
 
-
 ### Admin Endpoints
 
 #### List All Users
 
 - **Endpoint:** `GET /api/admin/users`
-- **Description:** Returns a list of all users.
-- **Headers:** `Authorization: Bearer <admin_token>`
+- **Description:** Returns a list of all users. Admin authentication is handled via cookies (`access_token`).
 - **Response Example:**
 
 ```json
@@ -220,15 +205,21 @@ The API will be available at `http://localhost:8000`.
 #### Promote User to Admin
 
 - **Endpoint:** `POST /api/admin/users/{id}/promote`
-- **Description:** Grants admin privileges to a user.
-- **Headers:** `Authorization: Bearer <admin_token>`
-- **Response Example:** Updated user object with `is_admin: true`.
+- **Description:** Grants admin privileges to a user. Admin authentication is handled via cookies (`access_token`).
+- **Response Example:**
+
+```json
+{
+  "id": "uuid-here",
+  "username": "alice",
+  "is_admin": true
+}
+```
 
 #### Delete User
 
 - **Endpoint:** `DELETE /api/admin/users/{id}`
-- **Description:** Permanently deletes a user account.
-- **Headers:** `Authorization: Bearer <admin_token>`
+- **Description:** Permanently deletes a user account. Admin authentication is handled via cookies (`access_token`).
 - **Response Example:**
 
 ```json
