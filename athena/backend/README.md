@@ -71,13 +71,24 @@ migrate -path migrations -database sqlite3://dev.db -verbose down
 go run cmd/server/main.go
 ```
 
-or use `air` for live reload:
+> ![NOTE]
+> If you make any changes to the backend code, you will need to stop
+> and rerun this command to see updates. 
+
+If you want live reload, you can use [Air](https://github.com/air-verse/air):
 
 ```bash
-air -build.cmd "go run ./cmd/server"
+go install github.com/air-verse/air@latest
+air -build.cmd go run ./cmd/server
 ```
 
-The API will be available at `http://localhost:8000`
+If the port ever gets stuck, kill it with:
+
+```bash
+lsof -ti tcp:8000 | xargs kill -9
+```
+
+The API will be available at `http://localhost:8000`.
 
 ## API Endpoints
 
