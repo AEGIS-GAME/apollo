@@ -1,6 +1,8 @@
 import { useForm } from "@tanstack/react-form"
 import Input from "../ui/Input"
 import Button from "../ui/Button"
+import { useRegister } from "@/hooks/useAuth"
+import ErrorMessage from "../ui/ErrorMessage"
 
 export default function RegisterForm(): React.JSX.Element {
   interface FormData {
@@ -15,10 +17,11 @@ export default function RegisterForm(): React.JSX.Element {
     confirmPassword: "",
   }
 
+  const registerMutation = useRegister()
   const form = useForm({
     defaultValues: defaultFormData,
     onSubmit: async ({ value }) => {
-      console.log(value)
+      registerMutation.mutate(value)
     },
   })
 
@@ -105,6 +108,13 @@ export default function RegisterForm(): React.JSX.Element {
           )}
         </form.Field>
 
+        {registerMutation.isError && <ErrorMessage>{registerMutation.error.message}</ErrorMessage>}
+        {registerMutation.isSuccess && (
+          <span className="text-success text-center text-sm mt-2 block" role="status">
+            Registration successful
+          </span>
+        )}
+
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
         >
@@ -113,7 +123,7 @@ export default function RegisterForm(): React.JSX.Element {
               label="Register"
               type="submit"
               disabled={!canSubmit}
-              loading={isSubmitting}
+              loading={isSubmitting || registerMutation.isPending}
               fullWidth
             />
           )}

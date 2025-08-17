@@ -1,5 +1,6 @@
 import React, { useId } from "react"
 import Label from "./Label"
+import ErrorMessage from "./ErrorMessage"
 
 interface InputProps extends React.ComponentPropsWithoutRef<"input"> {
   label?: string
@@ -27,11 +28,7 @@ export default function Input({
         aria-describedby={error ? `${inputId}-error` : undefined}
         {...props}
       />
-      {error && (
-        <span id={`${inputId}-error`} className="text-danger text-sm">
-          {error}
-        </span>
-      )}
+      <ErrorMessage id={`${inputId}-error`}>{error}</ErrorMessage>
     </div>
   )
 }
