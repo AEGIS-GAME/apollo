@@ -71,7 +71,7 @@ migrate -path migrations -database sqlite3://dev.db -verbose down
 go run cmd/server/main.go
 ```
 
-> ![NOTE]
+> [!NOTE]
 > If you make any changes to the backend code, you will need to stop and rerun this command to see updates. 
 
 If you want live reload, you can use [Air](https://github.com/air-verse/air):
