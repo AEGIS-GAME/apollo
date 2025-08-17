@@ -108,7 +108,7 @@ export default function RegisterForm(): React.JSX.Element {
           )}
         </form.Field>
 
-        {registerMutation.isError && <ErrorMessage>{registerMutation.error.message}</ErrorMessage>}
+        {registerMutation.isError && <ErrorMessage className="text-center">{registerMutation.error.message}</ErrorMessage>}
         {registerMutation.isSuccess && (
           <span className="text-success text-center text-sm mt-2 block" role="status">
             Registration successful
