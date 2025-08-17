@@ -1,17 +1,20 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
-	"github.com/AEGIS-GAME/apollo/athena/backend/internal/config"
 	"github.com/AEGIS-GAME/apollo/athena/backend/shared"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func AuthMiddleware(next http.Handler, cfg *config.Config) http.Handler {
+const claimsKey contextKey = "claims"
+
+func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var tokenStr string
+		cfg := GetConfig(r)
 
 		if cookie, err := r.Cookie("access_token"); err == nil {
 			tokenStr = cookie.Value
@@ -46,6 +49,19 @@ func AuthMiddleware(next http.Handler, cfg *config.Config) http.Handler {
 			return
 		}
 
+		if claims, ok := token.Claims.(jwt.MapClaims); ok {
+			ctx := context.WithValue(r.Context(), claimsKey, claims)
+			r = r.WithContext(ctx)
+		} else {
+			shared.RespondWithError(w, http.StatusUnauthorized, "invalid token claims")
+			return
+		}
+
 		next.ServeHTTP(w, r)
 	})
+}
+
+func ExtractClaims(r *http.Request) (jwt.MapClaims, bool) {
+	claims, ok := r.Context().Value(claimsKey).(jwt.MapClaims)
+	return claims, ok
 }
