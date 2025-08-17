@@ -10,7 +10,7 @@ const VARIANTS = {
 
 type VariantType = keyof typeof VARIANTS
 
-const DISABLED = "cursor-not-allowed opacity-50"
+const DISABLED = "cursor-not-allowed bg-primary opacity-50"
 
 interface ButtonProps extends React.ComponentPropsWithoutRef<"button"> {
   label: string

@@ -21,7 +21,7 @@ export default function Input({
       <input
         id={inputId}
         className={`rounded-md px-2.5 py-1.5 text-fg placeholder:text-fg-muted
-          border border-border focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary
+          border-0 focus:outline-none ring-inset ring-border ring-1 focus:ring-primary
           ${className} ${error ? "border-danger" : ""}`}
         aria-invalid={!!error}
         aria-describedby={error ? `${inputId}-error` : undefined}
