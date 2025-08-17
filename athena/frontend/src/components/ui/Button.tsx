@@ -2,7 +2,7 @@ import { LoaderCircle } from "lucide-react"
 
 const VARIANTS = {
   primary: "bg-primary text-fg hover:bg-primary-hover hover:cursor-pointer",
-  secondary: "bg-primary-muted text-fg hover:bg-primary hover:cursor-pointer",
+  secondary: "bg-primary-muted text-fg hover:bg-gray-300 hover:cursor-pointer",
   danger: "bg-danger text-white hover:bg-danger-hover hover:cursor-pointer",
   outline:
     "border border-primary text-fg hover:bg-primary-muted hover:cursor-pointer",
