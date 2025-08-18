@@ -5,20 +5,11 @@ import type { LoginCredentials } from "../models/User"
 const USER_API = new UserApi()
 const TOKEN_API = new TokenApi()
 
-export function useRegister() {
+export function useRegister(queryClient: QueryClient) {
   return useMutation({
-    mutationFn: ({
-      username,
-      password,
-    }: { username: string; password: string }) =>
-      USER_API.register(username, password),
-    onSuccess: (userData) => {
-      const normalized = {
-        id: userData.id,
-        username: userData.username,
-        isAdmin: userData.is_admin,
-      }
-      console.log(normalized)
+    mutationFn: async (credentials: LoginCredentials) => {
+      await USER_API.register(credentials)
+      queryClient.setQueryData<boolean>(["loggedIn"], true)
     },
   })
 }

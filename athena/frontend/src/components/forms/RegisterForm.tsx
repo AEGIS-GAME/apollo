@@ -1,9 +1,10 @@
 import { useForm } from "@tanstack/react-form"
 import Input from "../ui/Input"
 import Button from "../ui/Button"
-import { useRegister } from "@/hooks/useAuth"
 import ErrorMessage from "../ui/ErrorMessage"
 import { useNavigate } from "@tanstack/react-router"
+import { useRegister } from "@/api/auth/useAuth"
+import { useQueryClient } from "@tanstack/react-query"
 
 export default function RegisterForm(): React.JSX.Element {
   interface FormData {
@@ -18,8 +19,9 @@ export default function RegisterForm(): React.JSX.Element {
     confirmPassword: "",
   }
 
+  const queryClient = useQueryClient()
   const navigate = useNavigate()
-  const registerMutation = useRegister()
+  const registerMutation = useRegister(queryClient)
   const form = useForm({
     defaultValues: defaultFormData,
     onSubmit: async ({ value }) => {

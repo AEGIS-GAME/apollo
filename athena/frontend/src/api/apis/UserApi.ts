@@ -2,8 +2,8 @@ import Api from "../Api"
 import type { LoginCredentials, MessageResponse, User } from "../models/User"
 
 export class UserApi extends Api {
-  async register(username: string, password: string): Promise<User> {
-    return await this.post<User>("/users/register", { username, password })
+  async register(credentials: LoginCredentials): Promise<User> {
+    return await this.post<User>("/users/register", credentials)
   }
 
   async login(credentials: LoginCredentials): Promise<User> {
