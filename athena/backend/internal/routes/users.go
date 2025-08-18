@@ -16,6 +16,8 @@ func UsersRouter(app *config.App) chi.Router {
 	r.Post("/login", users.LoginHandler(app.DB))
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.AuthMiddleware)
+
+		r.Post("/logout", users.LogoutHandler)
 		r.Get("/me", users.GetMeHandler(app.DB))
 		r.Delete("/me", users.DeleteMeHandler(app.DB))
 		r.Post("/refresh", users.RefreshHandler(app.DB))
