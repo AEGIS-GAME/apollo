@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	AccessTokenDuration  = 1 * time.Minute
+	AccessTokenDuration  = 15 * time.Minute
 	RefreshTokenDuration = 7 * 24 * time.Hour
 	RefreshTokenType     = "refresh"
 	MinPasswordLength    = 8
