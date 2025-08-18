@@ -10,6 +10,7 @@ but additional endpoints will be added in the future.
     - [User API](#user-api)
       - [Register a New User](#register-a-new-user)
       - [Login](#login)
+      - [Logout](#logout)
       - [Get Current User](#get-current-user)
       - [Delete Account](#delete-account)
     - [Admin Endpoints](#admin-endpoints)
@@ -144,6 +145,18 @@ and returns user info.
   "id": "uuid-here",
   "username": "alice",
   "is_admin": false
+}
+```
+
+#### Logout
+
+- **Endpoint:** `POST /api/users/logout`
+- **Description:** Logs out the authenticated user by clearing authentication cookies (`access_token` and `refresh_token`).
+- **Response Example:**
+
+```json
+{
+  "message": "Logged out successfully"
 }
 ```
 

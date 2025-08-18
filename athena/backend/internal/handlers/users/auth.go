@@ -228,7 +228,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	shared.RespondWithJSON(w, http.StatusOK, map[string]string{
-		"message": "logged out successfully",
+		"message": "Logged out successfully",
 	})
 }
 
