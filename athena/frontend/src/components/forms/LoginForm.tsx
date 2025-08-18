@@ -3,6 +3,7 @@ import Input from "../ui/Input"
 import Button from "../ui/Button"
 import { useLogin } from "@/hooks/useAuth"
 import ErrorMessage from "../ui/ErrorMessage"
+import { useNavigate } from "@tanstack/react-router"
 
 export default function LoginForm(): React.JSX.Element {
   interface FormData {
@@ -15,11 +16,14 @@ export default function LoginForm(): React.JSX.Element {
     password: "",
   }
 
+  const navigate = useNavigate()
   const loginMutation = useLogin()
   const form = useForm({
     defaultValues: defaultFormData,
     onSubmit: async ({ value }) => {
-      loginMutation.mutate(value)
+      loginMutation.mutate(value, {
+        onSuccess: () => navigate({ to: "/" })
+      })
     },
   })
 

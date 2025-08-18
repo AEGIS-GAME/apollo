@@ -3,6 +3,8 @@ import { Route as loginRoute } from "@/routes/login"
 import { Route as registerRoute } from "@/routes/register"
 import { Route as homeRoute } from "@/routes/index"
 import Button from "../ui/Button"
+import { useAuthStore } from "@/stores/authStore"
+import { useLogout } from "@/hooks/useAuth"
 
 export default function Header(): React.JSX.Element | null {
   const hideHeaderRoutes = [loginRoute.to, registerRoute.to]
@@ -12,7 +14,11 @@ export default function Header(): React.JSX.Element | null {
     matchRoute({ to: route }),
   )
 
+  const user = useAuthStore((s) => s.user)
+  const { mutate: logout } = useLogout()
+
   if (matchedHideHeaderRoutes) return null
+
 
   return (
     <header className="fixed top-0 z-10 w-full bg-gray-100 shadow-sm">
@@ -26,12 +32,18 @@ export default function Header(): React.JSX.Element | null {
         </Link>
 
         <div className="flex gap-3">
-          <Link to={loginRoute.to}>
-            <Button label="Login" />
-          </Link>
-          <Link to={registerRoute.to}>
-            <Button label="Register" variant="secondary" />
-          </Link>
+          {user ? (
+            <Button label="Logout" onClick={() => logout()} />
+          ) : (
+            <>
+              <Link to={loginRoute.to}>
+                <Button label="Login" />
+              </Link>
+              <Link to={registerRoute.to}>
+                <Button label="Register" variant="secondary" />
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
