@@ -3,6 +3,7 @@ import Input from "../ui/Input"
 import Button from "../ui/Button"
 import { useRegister } from "@/hooks/useAuth"
 import ErrorMessage from "../ui/ErrorMessage"
+import { useNavigate } from "@tanstack/react-router"
 
 export default function RegisterForm(): React.JSX.Element {
   interface FormData {
@@ -17,11 +18,15 @@ export default function RegisterForm(): React.JSX.Element {
     confirmPassword: "",
   }
 
+
+  const navigate = useNavigate()
   const registerMutation = useRegister()
   const form = useForm({
     defaultValues: defaultFormData,
     onSubmit: async ({ value }) => {
-      registerMutation.mutate(value)
+      registerMutation.mutate(value, {
+        onSuccess: () => navigate({ to: "/" })
+      })
     },
   })
 
