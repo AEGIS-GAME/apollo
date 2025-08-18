@@ -18,14 +18,13 @@ export default function RegisterForm(): React.JSX.Element {
     confirmPassword: "",
   }
 
-
   const navigate = useNavigate()
   const registerMutation = useRegister()
   const form = useForm({
     defaultValues: defaultFormData,
     onSubmit: async ({ value }) => {
       registerMutation.mutate(value, {
-        onSuccess: () => navigate({ to: "/" })
+        onSuccess: () => navigate({ to: "/" }),
       })
     },
   })
@@ -113,9 +112,16 @@ export default function RegisterForm(): React.JSX.Element {
           )}
         </form.Field>
 
-        {registerMutation.isError && <ErrorMessage className="text-center">{registerMutation.error.message}</ErrorMessage>}
+        {registerMutation.isError && (
+          <ErrorMessage className="text-center">
+            {registerMutation.error.message}
+          </ErrorMessage>
+        )}
         {registerMutation.isSuccess && (
-          <span className="text-success text-center text-sm mt-2 block" role="status">
+          <span
+            className="text-success text-center text-sm mt-2 block"
+            role="status"
+          >
             Registration successful
           </span>
         )}

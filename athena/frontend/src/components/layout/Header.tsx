@@ -4,9 +4,27 @@ import { Route as registerRoute } from "@/routes/register"
 import { Route as homeRoute } from "@/routes/index"
 import Button from "../ui/Button"
 import { useAuthStore } from "@/stores/authStore"
-import { useLogout } from "@/hooks/useAuth"
+import { useIsLoggedIn } from "@/api/user/useUser"
+import { useEffect } from "react"
+import { useLogout } from "@/api/auth/useAuth"
+import { useQueryClient } from "@tanstack/react-query"
+// import { useLogout } from "@/hooks/useAuth"
 
 export default function Header(): React.JSX.Element | null {
+  const queryClient = useQueryClient()
+  const logout = useLogout(queryClient)
+
+  const setIsLoggedIn = useAuthStore((s) => s.setIsLoggedIn)
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
+  const query = useIsLoggedIn()
+
+  useEffect(() => {
+    if (query.data !== undefined) {
+      setIsLoggedIn(query.data)
+    }
+  }, [query.data, setIsLoggedIn])
+
+
   const hideHeaderRoutes = [loginRoute.to, registerRoute.to]
   const matchRoute = useMatchRoute()
 
@@ -14,11 +32,7 @@ export default function Header(): React.JSX.Element | null {
     matchRoute({ to: route }),
   )
 
-  const user = useAuthStore((s) => s.user)
-  const { mutate: logout } = useLogout()
-
   if (matchedHideHeaderRoutes) return null
-
 
   return (
     <header className="fixed top-0 z-10 w-full bg-gray-100 shadow-sm">
@@ -32,8 +46,8 @@ export default function Header(): React.JSX.Element | null {
         </Link>
 
         <div className="flex gap-3">
-          {user ? (
-            <Button label="Logout" onClick={() => logout()} />
+          {isLoggedIn ? (
+            <Button label="Logout" onClick={() => logout.mutate()} />
           ) : (
             <>
               <Link to={loginRoute.to}>

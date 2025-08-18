@@ -19,4 +19,4 @@ RUN go install github.com/air-verse/air@latest
 
 EXPOSE 8000
 
-CMD ["air", "-build.cmd", "go run ./cmd/server"]
+CMD ["air", "-build.cmd", "go build -o tmp/main ./cmd/server"]

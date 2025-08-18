@@ -12,5 +12,5 @@ function RouteComponent() {
         <RegisterForm />
       </div>
     </div>
-  );
+  )
 }

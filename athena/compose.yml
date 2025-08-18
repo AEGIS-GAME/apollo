@@ -3,6 +3,8 @@ services:
     build: ./backend
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend:/app
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s

@@ -16,7 +16,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		var tokenStr string
 		cfg := GetConfig(r)
 
-		if cookie, err := r.Cookie("access_token"); err == nil {
+		if cookie, err := r.Cookie("access"); err == nil {
 			tokenStr = cookie.Value
 		}
 
