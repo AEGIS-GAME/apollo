@@ -8,7 +8,6 @@ import { useIsLoggedIn } from "@/api/user/useUser"
 import { useEffect } from "react"
 import { useLogout } from "@/api/auth/useAuth"
 import { useQueryClient } from "@tanstack/react-query"
-// import { useLogout } from "@/hooks/useAuth"
 
 export default function Header(): React.JSX.Element | null {
   const queryClient = useQueryClient()
@@ -23,7 +22,6 @@ export default function Header(): React.JSX.Element | null {
       setIsLoggedIn(query.data)
     }
   }, [query.data, setIsLoggedIn])
-
 
   const hideHeaderRoutes = [loginRoute.to, registerRoute.to]
   const matchRoute = useMatchRoute()

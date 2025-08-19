@@ -26,10 +26,10 @@ export default function LoginForm(): React.JSX.Element {
     onSubmit: async ({ value }) => {
       const credentials = {
         username: value.username,
-        password: value.password
+        password: value.password,
       }
       loginMutation.mutate(credentials, {
-        onSuccess: () => navigate({ to: "/" })
+        onSuccess: () => navigate({ to: "/" }),
       })
     },
   })

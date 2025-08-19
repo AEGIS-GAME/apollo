@@ -1,7 +1,4 @@
-import {
-  useQuery,
-  type UseQueryResult,
-} from "@tanstack/react-query"
+import { useQuery, type UseQueryResult } from "@tanstack/react-query"
 import { tokenVerify } from "../auth/useAuth"
 
 export function useIsLoggedIn(): UseQueryResult<boolean> {
