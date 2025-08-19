@@ -9,6 +9,7 @@ func APIRouter(app *config.App) chi.Router {
 	r := chi.NewRouter()
 
 	r.Mount("/users", UsersRouter(app))
+	r.Mount("/token", TokenRouter(app))
 
 	return r
 }

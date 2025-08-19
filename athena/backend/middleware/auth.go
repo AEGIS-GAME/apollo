@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/AEGIS-GAME/apollo/athena/backend/shared"
 	"github.com/golang-jwt/jwt/v5"
@@ -16,7 +17,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		var tokenStr string
 		cfg := GetConfig(r)
 
-		if cookie, err := r.Cookie("access_token"); err == nil {
+		if cookie, err := r.Cookie("access"); err == nil {
 			tokenStr = cookie.Value
 		}
 
@@ -49,14 +50,24 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			ctx := context.WithValue(r.Context(), claimsKey, claims)
-			r = r.WithContext(ctx)
-		} else {
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
 			shared.RespondWithError(w, http.StatusUnauthorized, "invalid token claims")
 			return
 		}
 
+		if exp, ok := claims["exp"].(float64); ok {
+			if time.Now().Unix() > int64(exp) {
+				shared.RespondWithError(w, http.StatusUnauthorized, "token expired")
+				return
+			}
+		} else {
+			shared.RespondWithError(w, http.StatusUnauthorized, "token missing expiration")
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), claimsKey, claims)
+		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
 }
