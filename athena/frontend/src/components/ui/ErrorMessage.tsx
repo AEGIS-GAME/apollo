@@ -4,7 +4,11 @@ interface ErrorMessageProps {
   children: React.ReactNode
 }
 
-export default function ErrorMessage({ id, className, children }: ErrorMessageProps) {
+export default function ErrorMessage({
+  id,
+  className,
+  children,
+}: ErrorMessageProps) {
   if (!children) return null
 
   return (

@@ -1,8 +1,10 @@
 import { useForm } from "@tanstack/react-form"
 import Input from "../ui/Input"
 import Button from "../ui/Button"
-import { useLogin } from "@/hooks/useAuth"
 import ErrorMessage from "../ui/ErrorMessage"
+import { useNavigate } from "@tanstack/react-router"
+import { useLogin } from "@/api/auth/useAuth"
+import { useQueryClient } from "@tanstack/react-query"
 
 export default function LoginForm(): React.JSX.Element {
   interface FormData {
@@ -15,19 +17,26 @@ export default function LoginForm(): React.JSX.Element {
     password: "",
   }
 
-  const loginMutation = useLogin()
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const loginMutation = useLogin(queryClient)
+
   const form = useForm({
     defaultValues: defaultFormData,
     onSubmit: async ({ value }) => {
-      loginMutation.mutate(value)
+      const credentials = {
+        username: value.username,
+        password: value.password,
+      }
+      loginMutation.mutate(credentials, {
+        onSuccess: () => navigate({ to: "/" }),
+      })
     },
   })
 
   return (
     <div className="w-full max-w-md bg-card rounded-2xl shadow-lg p-8 sm:p-10">
-      <h2 className="text-fg text-2xl font-semibold mb-6 text-center">
-        Login
-      </h2>
+      <h2 className="text-fg text-2xl font-semibold mb-6 text-center">Login</h2>
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -77,9 +86,16 @@ export default function LoginForm(): React.JSX.Element {
           )}
         </form.Field>
 
-        {loginMutation.isError && <ErrorMessage className="text-center">{loginMutation.error.message}</ErrorMessage>}
+        {loginMutation.isError && (
+          <ErrorMessage className="text-center">
+            {loginMutation.error.message}
+          </ErrorMessage>
+        )}
         {loginMutation.isSuccess && (
-          <span className="text-success text-center text-sm mt-2 block" role="status">
+          <span
+            className="text-success text-center text-sm mt-2 block"
+            role="status"
+          >
             Login successful
           </span>
         )}
@@ -92,7 +108,7 @@ export default function LoginForm(): React.JSX.Element {
               label="Login"
               type="submit"
               disabled={!canSubmit}
-              loading={isSubmitting || loginMutation.isPending}
+              loading={isSubmitting}
               fullWidth
             />
           )}
