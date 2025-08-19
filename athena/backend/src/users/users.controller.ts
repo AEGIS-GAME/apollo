@@ -4,7 +4,7 @@ import { Response } from "express"
 
 @Controller("user")
 export class UserController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(private readonly userService: UsersService) { }
 
   @Post("register")
   async register(
@@ -14,7 +14,9 @@ export class UserController {
     const user = await this.userService.create(body.username, body.password)
     const tokens = this.userService.generateTokens(user.id)
 
+
     res.cookie("access_token", tokens.accessToken, {
+
       httpOnly: true,
       sameSite: "strict",
       maxAge: 15 * 60 * 1000, // 15min
