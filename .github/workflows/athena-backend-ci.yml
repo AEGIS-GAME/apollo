@@ -30,6 +30,7 @@ jobs:
 
       - name: Setup Node 
         uses: actions/setup-node@v4
+        working-directory: athena/backend
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -51,6 +52,7 @@ jobs:
 
       - name: Setup Node
         uses: actions/setup-node@v4
+        working-directory: athena/backend
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
