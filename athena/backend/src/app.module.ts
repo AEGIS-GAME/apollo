@@ -11,6 +11,7 @@ const isProd = process.env.NODE_ENV === "production"
   imports: [
     AuthModule,
     UsersModule,
+    TokenModule,
     ConfigModule.forRoot({ cache: true }),
     TypeOrmModule.forRoot({
       type: isProd ? "postgres" : "sqlite",
@@ -19,7 +20,6 @@ const isProd = process.env.NODE_ENV === "production"
       synchronize: !isProd,
       autoLoadEntities: true,
     }),
-    TokenModule,
   ],
   controllers: [],
   providers: [],

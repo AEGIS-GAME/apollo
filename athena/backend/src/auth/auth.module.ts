@@ -5,7 +5,7 @@ import { UsersModule } from "../users/users.module"
 import { ConfigModule } from "@nestjs/config"
 import { APP_GUARD } from "@nestjs/core"
 import { AuthGuard } from "./auth.guard"
-import { TokenModule } from "src/token/token.module"
+import { TokenModule } from "../token/token.module"
 
 @Module({
   imports: [UsersModule, ConfigModule, TokenModule],

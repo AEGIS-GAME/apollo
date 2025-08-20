@@ -9,7 +9,7 @@ import { ConflictException, UnauthorizedException } from "@nestjs/common"
 describe("AuthService", () => {
   let service: AuthService
   let usersService: jest.Mocked<UsersService>
-  let tokenService: jest.Mocked<TokenService>;
+  let tokenService: jest.Mocked<TokenService>
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,7 +34,7 @@ describe("AuthService", () => {
 
     service = module.get<AuthService>(AuthService)
     usersService = module.get(UsersService)
-    tokenService = module.get(TokenService);
+    tokenService = module.get(TokenService)
   })
 
   describe("login", () => {
@@ -70,7 +70,7 @@ describe("AuthService", () => {
       tokenService.generateTokenPair.mockReturnValue({
         access: "fake-access",
         refresh: "fake-refresh",
-      });
+      })
 
       const result = await service.login("test", "correct")
       expect(result).toEqual({
@@ -101,7 +101,7 @@ describe("AuthService", () => {
       tokenService.generateTokenPair.mockReturnValue({
         access: "fake-access",
         refresh: "fake-refresh",
-      });
+      })
 
       const result = await service.register("new", "pass")
       expect(result).toEqual({

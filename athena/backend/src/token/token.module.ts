@@ -15,4 +15,4 @@ import { JwtModule } from "@nestjs/jwt"
   providers: [TokenService],
   exports: [TokenService],
 })
-export class TokenModule { }
+export class TokenModule {}
