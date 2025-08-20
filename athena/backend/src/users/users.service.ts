@@ -8,7 +8,7 @@ import {
 import { Kysely } from "kysely"
 import { DB } from "src/db/types"
 import * as bcrypt from "bcrypt"
-import * as jwt from "jsonwebtoken"
+import { CreateUserDto } from "./dto/create-user.dto"
 
 @Injectable()
 export class UsersService {
@@ -26,39 +26,35 @@ export class UsersService {
     return user
   }
 
-  // async create(username: string, password: string) {
-  //   const existing = await this.db
-  //     .selectFrom("users")
-  //     .select("id")
-  //     .where("username", "=", username)
-  //     .executeTakeFirst()
-  //
-  //   if (existing) throw new ConflictException("Username already taken")
-  //
-  //   const password_hash = await bcrypt.hash(password, this.SALT_ROUNDS)
-  //
-  //   const user = await this.db
-  //     .insertInto("users")
-  //     .values({ username, password_hash, is_admin: false })
-  //     .returningAll()
-  //     .executeTakeFirst()
-  //
-  //   if (!user) {
-  //     throw new InternalServerErrorException("Failed to create user")
-  //   }
-  //
-  //   return user
-  // }
-  //
-  // generateTokens(userId: number) {
-  //   const accessToken = jwt.sign({ sub: userId }, process.env.ACCESS_TOKEN_SECRET!, {
-  //     expiresIn: "15m",
-  //   })
-  //
-  //   const refreshToken = jwt.sign({ sub: userId }, process.env.REFRESH_TOKEN_SECRET!, {
-  //     expiresIn: "7d",
-  //   })
-  //
-  //   return { accessToken, refreshToken }
-  // }
+  async userExists(username: string): Promise<boolean> {
+    const user = await this.db
+      .selectFrom("users")
+      .where("username", "=", username)
+      .select("id")
+      .executeTakeFirst()
+
+    return !!user
+  }
+
+  async insertUser(dto: CreateUserDto): Promise<void> {
+    const { username, password, admin = false } = dto;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    try {
+      await this.db
+        .insertInto("users")
+        .values({
+          username,
+          password_hash: hashedPassword,
+          admin,
+        })
+        .execute();
+    } catch (err: any) {
+      console.log(err)
+      if (err.code === "SQLITE_CONSTRAINT") {
+        throw new ConflictException("Username already taken");
+      }
+      throw new InternalServerErrorException("Failed to create user");
+    }
+  }
 }
