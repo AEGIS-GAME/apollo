@@ -41,7 +41,7 @@ describe("TokenController", () => {
       const result = controller.refresh({ user: fakeUser })
 
       expect(signSpy).toHaveBeenCalledWith(42)
-      expect(result).toBe("access-token")
+      expect(result).toEqual({ access: "access-token" })
     })
   })
 
