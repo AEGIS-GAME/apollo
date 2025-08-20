@@ -12,5 +12,5 @@ export class Users {
   password!: string
 
   @Column({ default: false })
-  admin!: boolean
+  admin?: boolean
 }

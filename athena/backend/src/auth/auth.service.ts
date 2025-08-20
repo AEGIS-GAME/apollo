@@ -1,12 +1,11 @@
+import * as bcrypt from "bcrypt"
 import {
   ConflictException,
   Injectable,
-  InternalServerErrorException,
   UnauthorizedException,
 } from "@nestjs/common"
-import { UsersService } from "src/users/users.service"
+import { UsersService } from "../users/users.service"
 import { JwtService } from "@nestjs/jwt"
-import * as bcrypt from "bcrypt"
 import { ConfigService } from "@nestjs/config"
 import { TokenPairDto } from "./dto/token-pair.dto"
 
@@ -33,15 +32,14 @@ export class AuthService {
 
   async register(username: string, password: string): Promise<TokenPairDto> {
     const exists = await this.usersService.userExists(username)
-
     if (exists) throw new ConflictException("Username already taken")
 
-    await this.usersService.insertUser({ username, password, admin: false })
-
-    const user = await this.usersService.getUserByUsername(username)
-    if (!user) {
-      throw new InternalServerErrorException("Failed to create user")
-    }
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const user = await this.usersService.insertUser({
+      username,
+      password: hashedPassword,
+      admin: false,
+    })
 
     return this.generateTokens(user.id)
   }

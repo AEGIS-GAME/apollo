@@ -1,4 +1,3 @@
-import * as bcrypt from "bcrypt"
 import { Injectable } from "@nestjs/common"
 import { Repository } from "typeorm"
 import { CreateUserDto } from "./dto/create-user.dto"
@@ -12,7 +11,7 @@ export class UsersService {
     private readonly usersRepo: Repository<Users>
   ) { }
 
-  async getUserByUsername(username: string) {
+  async getUserByUsername(username: string): Promise<Users | null> {
     return this.usersRepo.findOneBy({ username })
   }
 
@@ -22,10 +21,8 @@ export class UsersService {
   }
 
   async insertUser(dto: CreateUserDto): Promise<Users> {
-    const { username, password, admin = false } = dto
-    const hashedPassword = await bcrypt.hash(password, 10)
-
-    const user = this.usersRepo.create({ username, password: hashedPassword, admin })
-    return this.usersRepo.save(user)
+    return this.usersRepo.save(
+      this.usersRepo.create({ ...dto, admin: dto.admin ?? false })
+    )
   }
 }
