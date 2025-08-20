@@ -24,4 +24,4 @@ import { AuthGuard } from "./auth.guard"
     },
   ],
 })
-export class AuthModule { }
+export class AuthModule {}

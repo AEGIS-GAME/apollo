@@ -1,9 +1,5 @@
 import * as bcrypt from "bcrypt"
-import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from "@nestjs/common"
+import { ConflictException, Injectable, UnauthorizedException } from "@nestjs/common"
 import { UsersService } from "../users/users.service"
 import { JwtService } from "@nestjs/jwt"
 import { ConfigService } from "@nestjs/config"
@@ -15,7 +11,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService
-  ) { }
+  ) {}
 
   async login(username: string, password: string): Promise<TokenPairDto> {
     const user = await this.usersService.getUserByUsername(username)

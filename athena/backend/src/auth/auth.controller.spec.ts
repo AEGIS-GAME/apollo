@@ -26,9 +26,9 @@ describe("AuthController", () => {
   describe("login", () => {
     it("should call authService.login with correct params", async () => {
       const dto: LoginDto = { username: "user", password: "pass" }
-      const tokens: TokenPairDto = { access: "a", refresh: "b" };
+      const tokens: TokenPairDto = { access: "a", refresh: "b" }
 
-      (authService.login as jest.Mock).mockResolvedValue(tokens)
+      ;(authService.login as jest.Mock).mockResolvedValue(tokens)
 
       const result = await controller.login(dto)
 
@@ -40,9 +40,9 @@ describe("AuthController", () => {
   describe("register", () => {
     it("should call authService.register with correct params", async () => {
       const dto: RegisterDto = { username: "new", password: "pass" }
-      const tokens: TokenPairDto = { access: "x", refresh: "y" };
+      const tokens: TokenPairDto = { access: "x", refresh: "y" }
 
-      (authService.register as jest.Mock).mockResolvedValue(tokens)
+      ;(authService.register as jest.Mock).mockResolvedValue(tokens)
 
       const result = await controller.register(dto)
 

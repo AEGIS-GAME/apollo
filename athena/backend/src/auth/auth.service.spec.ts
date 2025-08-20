@@ -4,7 +4,11 @@ import { AuthService } from "./auth.service"
 import { UsersService } from "../users/users.service"
 import { JwtService } from "@nestjs/jwt"
 import { ConfigService } from "@nestjs/config"
-import { ConflictException, InternalServerErrorException, UnauthorizedException } from "@nestjs/common"
+import {
+  ConflictException,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from "@nestjs/common"
 
 describe("AuthService", () => {
   let service: AuthService
@@ -19,8 +23,8 @@ describe("AuthService", () => {
           useValue: {
             getUserByUsername: jest.fn(),
             userExists: jest.fn(),
-            insertUser: jest.fn()
-          }
+            insertUser: jest.fn(),
+          },
         },
         { provide: JwtService, useValue: { sign: jest.fn() } },
         { provide: ConfigService, useValue: { get: jest.fn() } },
@@ -78,9 +82,7 @@ describe("AuthService", () => {
     it("should throw Conflict if username taken", async () => {
       usersService.userExists.mockResolvedValue(true)
 
-      await expect(service.register("taken", "pass")).rejects.toThrow(
-        ConflictException
-      )
+      await expect(service.register("taken", "pass")).rejects.toThrow(ConflictException)
     })
 
     it("should return tokens if registration succeeds", async () => {

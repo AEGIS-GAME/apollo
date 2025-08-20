@@ -17,9 +17,9 @@ const isProd = process.env.NODE_ENV === "production"
       url: isProd ? process.env.DATABASE_URL : undefined,
       synchronize: !isProd,
       autoLoadEntities: true,
-    })
+    }),
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

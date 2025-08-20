@@ -9,7 +9,7 @@ export class UsersService {
   constructor(
     @InjectRepository(Users)
     private readonly usersRepo: Repository<Users>
-  ) { }
+  ) {}
 
   async getUserByUsername(username: string): Promise<Users | null> {
     return this.usersRepo.findOneBy({ username })
