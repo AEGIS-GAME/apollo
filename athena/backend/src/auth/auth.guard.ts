@@ -1,9 +1,14 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { Request } from 'express';
-import { ConfigService } from "@nestjs/config";
-import { Reflector } from "@nestjs/core";
-import { IS_PUBLIC_KEY } from "./decorators/public.decorator";
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common"
+import { JwtService } from "@nestjs/jwt"
+import { Request } from "express"
+import { ConfigService } from "@nestjs/config"
+import { Reflector } from "@nestjs/core"
+import { IS_PUBLIC_KEY } from "./decorators/public.decorator"
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -11,12 +16,12 @@ export class AuthGuard implements CanActivate {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly reflector: Reflector
-  ) { }
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
-      context.getClass()
+      context.getClass(),
     ])
 
     if (isPublic) {
@@ -27,7 +32,7 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request)
 
     if (!token) {
-      throw new UnauthorizedException('Authorization header missing or malformed');
+      throw new UnauthorizedException("Authorization header missing or malformed")
     }
 
     try {
@@ -35,13 +40,13 @@ export class AuthGuard implements CanActivate {
       const payload = this.jwtService.verify(token, { secret: accessSecret })
       request["user"] = payload
     } catch {
-      throw new UnauthorizedException('Invalid or expired token')
+      throw new UnauthorizedException("Invalid or expired token")
     }
     return true
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    const [type, token] = request.headers.authorization?.split(" ") ?? []
+    return type === "Bearer" ? token : undefined
   }
 }

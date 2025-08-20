@@ -1,13 +1,25 @@
 import { Module } from "@nestjs/common"
-import { createDb } from "./db";
+import { TypeOrmModule } from "@nestjs/typeorm"
 
 @Module({
-  providers: [
-    {
-      provide: "DB",
-      useValue: createDb()
-    },
+  imports: [
+    TypeOrmModule.forRootAsync({
+      useFactory: () => {
+        const isProd = process.env.NODE_ENV === "production"
+
+        return {
+          type: isProd ? "postgres" : "sqlite",
+          database: isProd ? undefined : "dev.db",
+          url: isProd ? process.env.DATABASE_URL : undefined,
+          migrations: [__dirname + "/db/migrations/*{.ts,.js}"],
+          cli: {
+            migrationsDir: "src/db/migrations",
+          },
+          synchronize: !isProd,
+          autoLoadEntities: true,
+        }
+      },
+    }),
   ],
-  exports: ["DB"],
 })
-export class DbModule { }
+export class DbModule {}

@@ -1,5 +1,5 @@
-import { Transform } from "class-transformer";
-import { IsNotEmpty, IsString, MinLength } from "class-validator";
+import { Transform } from "class-transformer"
+import { IsNotEmpty, IsString, MinLength } from "class-validator"
 
 export class LoginDto {
   @IsString()

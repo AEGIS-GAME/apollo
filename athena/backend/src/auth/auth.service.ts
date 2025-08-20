@@ -1,9 +1,14 @@
-import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
-import { JwtService } from '@nestjs/jwt';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from "@nestjs/common"
+import { UsersService } from "src/users/users.service"
+import { JwtService } from "@nestjs/jwt"
 import * as bcrypt from "bcrypt"
-import { ConfigService } from '@nestjs/config';
-import { TokenPairDto } from './dto/token-pair.dto';
+import { ConfigService } from "@nestjs/config"
+import { TokenPairDto } from "./dto/token-pair.dto"
 
 @Injectable()
 export class AuthService {
@@ -11,7 +16,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService
-  ) { }
+  ) {}
 
   async login(username: string, password: string): Promise<TokenPairDto> {
     const user = await this.usersService.getUserByUsername(username)
@@ -29,9 +34,9 @@ export class AuthService {
 
     if (exists) throw new ConflictException("Username already taken")
 
-    await this.usersService.insertUser({ username, password, admin: false });
+    await this.usersService.insertUser({ username, password, admin: false })
 
-    const user = await this.usersService.getUserByUsername(username);
+    const user = await this.usersService.getUserByUsername(username)
     if (!user) {
       throw new InternalServerErrorException("Failed to create user")
     }
@@ -43,15 +48,21 @@ export class AuthService {
     const accessSecret = this.configService.get<string>("JWT_ACCESS_SECRET")
     const refreshSecret = this.configService.get<string>("JWT_REFRESH_SECRET")
 
-    const access = this.jwtService.sign({ sub: userId }, {
-      secret: accessSecret,
-      expiresIn: "15m"
-    })
+    const access = this.jwtService.sign(
+      { sub: userId },
+      {
+        secret: accessSecret,
+        expiresIn: "15m",
+      }
+    )
 
-    const refresh = this.jwtService.sign({ sub: userId }, {
-      secret: refreshSecret,
-      expiresIn: "7d"
-    })
+    const refresh = this.jwtService.sign(
+      { sub: userId },
+      {
+        secret: refreshSecret,
+        expiresIn: "7d",
+      }
+    )
 
     return { access, refresh }
   }
