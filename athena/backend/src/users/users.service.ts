@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from "@nestjs/common"
 import { Kysely } from "kysely"
 import { DB } from "src/db/types"
@@ -11,43 +12,55 @@ import * as jwt from "jsonwebtoken"
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject("DB") private readonly db: Kysely<DB>) {}
+  constructor(@Inject("DB") private readonly db: Kysely<DB>) { }
 
-  private readonly SALT_ROUNDS = 10
-
-  async create(username: string, password: string) {
-    const existing = await this.db
-      .selectFrom("users")
-      .select("id")
-      .where("username", "=", username)
-      .executeTakeFirst()
-
-    if (existing) throw new ConflictException("Username already taken")
-
-    const password_hash = await bcrypt.hash(password, this.SALT_ROUNDS)
-
+  async getUserByUsername(username: string) {
     const user = await this.db
-      .insertInto("users")
-      .values({ username, password_hash, is_admin: false })
-      .returningAll()
+      .selectFrom("users")
+      .where("username", "=", username)
+      .selectAll()
       .executeTakeFirst()
 
-    if (!user) {
-      throw new InternalServerErrorException("Failed to create user")
-    }
+    if (!user) throw new NotFoundException("User not found")
 
     return user
   }
-
-  generateTokens(userId: number) {
-    const accessToken = jwt.sign({ sub: userId }, process.env.ACCESS_TOKEN_SECRET!, {
-      expiresIn: "15m",
-    })
-
-    const refreshToken = jwt.sign({ sub: userId }, process.env.REFRESH_TOKEN_SECRET!, {
-      expiresIn: "7d",
-    })
-
-    return { accessToken, refreshToken }
-  }
+  //
+  // private readonly SALT_ROUNDS = 10
+  //
+  // async create(username: string, password: string) {
+  //   const existing = await this.db
+  //     .selectFrom("users")
+  //     .select("id")
+  //     .where("username", "=", username)
+  //     .executeTakeFirst()
+  //
+  //   if (existing) throw new ConflictException("Username already taken")
+  //
+  //   const password_hash = await bcrypt.hash(password, this.SALT_ROUNDS)
+  //
+  //   const user = await this.db
+  //     .insertInto("users")
+  //     .values({ username, password_hash, is_admin: false })
+  //     .returningAll()
+  //     .executeTakeFirst()
+  //
+  //   if (!user) {
+  //     throw new InternalServerErrorException("Failed to create user")
+  //   }
+  //
+  //   return user
+  // }
+  //
+  // generateTokens(userId: number) {
+  //   const accessToken = jwt.sign({ sub: userId }, process.env.ACCESS_TOKEN_SECRET!, {
+  //     expiresIn: "15m",
+  //   })
+  //
+  //   const refreshToken = jwt.sign({ sub: userId }, process.env.REFRESH_TOKEN_SECRET!, {
+  //     expiresIn: "7d",
+  //   })
+  //
+  //   return { accessToken, refreshToken }
+  // }
 }

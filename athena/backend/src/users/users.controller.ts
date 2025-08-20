@@ -4,7 +4,7 @@ import { Response } from "express"
 
 @Controller("user")
 export class UserController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(private readonly userService: UsersService) { }
 
   @Post("register")
   async register(
