@@ -1,17 +1,13 @@
 import { Module } from "@nestjs/common"
-import { Kysely, SqliteDialect } from "kysely"
-import { DB } from "./types"
-import Database from "better-sqlite3"
+import { createDb } from "./db";
 
 @Module({
   providers: [
     {
       provide: "DB",
-      useValue: new Kysely<DB>({
-        dialect: new SqliteDialect({ database: new Database("dev.db") }),
-      }),
+      useValue: createDb()
     },
   ],
   exports: ["DB"],
 })
-export class DbModule {}
+export class DbModule { }

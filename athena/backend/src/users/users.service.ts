@@ -25,9 +25,7 @@ export class UsersService {
 
     return user
   }
-  //
-  // private readonly SALT_ROUNDS = 10
-  //
+
   // async create(username: string, password: string) {
   //   const existing = await this.db
   //     .selectFrom("users")
