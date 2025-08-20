@@ -1,53 +1,28 @@
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-} from "@nestjs/common"
-import { Kysely } from "kysely"
-import { DB } from "src/db/types"
-import * as bcrypt from "bcrypt"
-import * as jwt from "jsonwebtoken"
+import { Injectable } from "@nestjs/common"
+import { Repository } from "typeorm"
+import { CreateUserDto } from "./dto/create-user.dto"
+import { InjectRepository } from "@nestjs/typeorm"
+import { Users } from "./entities/users.entity"
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject("DB") private readonly db: Kysely<DB>) {}
+  constructor(
+    @InjectRepository(Users)
+    private readonly usersRepo: Repository<Users>
+  ) {}
 
-  private readonly SALT_ROUNDS = 10
-
-  async create(username: string, password: string) {
-    const existing = await this.db
-      .selectFrom("users")
-      .select("id")
-      .where("username", "=", username)
-      .executeTakeFirst()
-
-    if (existing) throw new ConflictException("Username already taken")
-
-    const password_hash = await bcrypt.hash(password, this.SALT_ROUNDS)
-
-    const user = await this.db
-      .insertInto("users")
-      .values({ username, password_hash, is_admin: false })
-      .returningAll()
-      .executeTakeFirst()
-
-    if (!user) {
-      throw new InternalServerErrorException("Failed to create user")
-    }
-
-    return user
+  async getUserByUsername(username: string): Promise<Users | null> {
+    return this.usersRepo.findOneBy({ username })
   }
 
-  generateTokens(userId: number) {
-    const accessToken = jwt.sign({ sub: userId }, process.env.ACCESS_TOKEN_SECRET!, {
-      expiresIn: "15m",
-    })
+  async userExists(username: string): Promise<boolean> {
+    const count = await this.usersRepo.count({ where: { username } })
+    return count > 0
+  }
 
-    const refreshToken = jwt.sign({ sub: userId }, process.env.REFRESH_TOKEN_SECRET!, {
-      expiresIn: "7d",
-    })
-
-    return { accessToken, refreshToken }
+  async insertUser(dto: CreateUserDto): Promise<Users> {
+    return this.usersRepo.save(
+      this.usersRepo.create({ ...dto, admin: dto.admin ?? false })
+    )
   }
 }

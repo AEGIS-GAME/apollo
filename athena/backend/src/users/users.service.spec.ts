@@ -1,57 +1,34 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
-import { ConflictException } from "@nestjs/common"
+import { Test, TestingModule } from "@nestjs/testing"
 import { UsersService } from "./users.service"
-import * as bcrypt from "bcrypt"
+import { getRepositoryToken } from "@nestjs/typeorm"
+// import { Repository } from "typeorm"
+import { Users } from "./entities/users.entity"
 
 describe("UsersService", () => {
   let service: UsersService
-  let fakeDb: any
+  // let usersRepo: jest.Mocked<Repository<Users>>
 
-  beforeEach(() => {
-    const selectMock: any = {
-      executeTakeFirst: jest.fn().mockResolvedValue(null),
-    }
-    selectMock.select = jest.fn().mockReturnValue(selectMock)
-    selectMock.where = jest.fn().mockReturnValue(selectMock)
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        UsersService,
+        {
+          provide: getRepositoryToken(Users),
+          useValue: {
+            findOneBy: jest.fn(),
+            save: jest.fn(),
+            create: jest.fn(),
+            count: jest.fn(),
+          },
+        },
+      ],
+    }).compile()
 
-    const insertMock = {
-      values: jest.fn().mockReturnThis(),
-      returningAll: jest.fn().mockReturnThis(),
-      executeTakeFirst: jest.fn().mockResolvedValue({ id: 1, username: "test" }),
-    }
-
-    fakeDb = {
-      selectFrom: jest.fn().mockReturnValue(selectMock),
-      insertInto: jest.fn().mockReturnValue(insertMock),
-    }
-
-    service = new UsersService(fakeDb)
+    service = module.get<UsersService>(UsersService)
+    // usersRepo = module.get(getRepositoryToken(Users))
   })
 
   it("should be defined", () => {
     expect(service).toBeDefined()
-  })
-
-  it("should hash password when creating user", async () => {
-    const user = await service.create("test", "password")
-
-    const insertedValues = fakeDb.insertInto().values.mock.calls[0][0]
-    const match = await bcrypt.compare("password", insertedValues.password_hash)
-
-    expect(user.id).toBe(1)
-    expect(match).toBe(true)
-    expect(fakeDb.insertInto().values).toHaveBeenCalledWith(
-      expect.objectContaining({ password_hash: expect.any(String) })
-    )
-  })
-
-  it("should throw on duplicate username", async () => {
-    fakeDb.selectFrom().select().where().executeTakeFirst.mockResolvedValue({ id: 1 })
-
-    await expect(service.create("test", "password")).rejects.toThrow(ConflictException)
   })
 })
