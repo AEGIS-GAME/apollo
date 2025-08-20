@@ -1,8 +1,9 @@
+import { TypeOrmModule } from "@nestjs/typeorm"
 import { Module } from "@nestjs/common"
 import { AuthModule } from "./auth/auth.module"
 import { ConfigModule } from "@nestjs/config"
 import { UsersModule } from "./users/users.module"
-import { TypeOrmModule } from "@nestjs/typeorm"
+import { TokenModule } from "./token/token.module"
 
 const isProd = process.env.NODE_ENV === "production"
 
@@ -18,6 +19,7 @@ const isProd = process.env.NODE_ENV === "production"
       synchronize: !isProd,
       autoLoadEntities: true,
     }),
+    TokenModule,
   ],
   controllers: [],
   providers: [],

@@ -9,12 +9,7 @@ import { Request } from "express"
 import { ConfigService } from "@nestjs/config"
 import { Reflector } from "@nestjs/core"
 import { IS_PUBLIC_KEY } from "./decorators/public.decorator"
-
-interface JwtPayload {
-  sub: number
-  iat?: number
-  exp?: number
-}
+import { TokenDto } from "../token/dto/token.dto"
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -35,7 +30,7 @@ export class AuthGuard implements CanActivate {
       return true
     }
 
-    const request = context.switchToHttp().getRequest<Request & { user?: JwtPayload }>()
+    const request = context.switchToHttp().getRequest<Request & { user?: TokenDto }>()
     const token = this.extractTokenFromHeader(request)
 
     if (!token) {
@@ -44,7 +39,7 @@ export class AuthGuard implements CanActivate {
 
     try {
       const accessSecret = this.configService.get<string>("JWT_ACCESS_SECRET")
-      const payload = this.jwtService.verify<JwtPayload>(token, {
+      const payload = this.jwtService.verify<TokenDto>(token, {
         secret: accessSecret,
       })
       request.user = payload

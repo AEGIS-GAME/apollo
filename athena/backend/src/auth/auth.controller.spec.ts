@@ -3,7 +3,7 @@ import { AuthController } from "./auth.controller"
 import { AuthService } from "./auth.service"
 import { LoginDto } from "./dto/login.dto"
 import { RegisterDto } from "./dto/register.dto"
-import { TokenPairDto } from "./dto/token-pair.dto"
+import { TokenPairDto } from "../token/dto/token-pair.dto"
 
 describe("AuthController", () => {
   let controller: AuthController
