@@ -10,7 +10,7 @@ export class UsersService {
   constructor(
     @InjectRepository(Users)
     private readonly usersRepo: Repository<Users>
-  ) {}
+  ) { }
 
   async getUserByUsername(username: string) {
     return this.usersRepo.findOneBy({ username })

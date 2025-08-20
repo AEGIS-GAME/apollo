@@ -16,12 +16,14 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService
-  ) {}
+  ) { }
 
   async login(username: string, password: string): Promise<TokenPairDto> {
     const user = await this.usersService.getUserByUsername(username)
 
-    const isValid = await bcrypt.compare(password, user.password_hash)
+    if (!user) throw new UnauthorizedException("Invalid credentials")
+
+    const isValid = await bcrypt.compare(password, user.password)
     if (!isValid) {
       throw new UnauthorizedException()
     }
