@@ -4,11 +4,8 @@ import { AuthService } from "./auth.service"
 import { UsersService } from "../users/users.service"
 import { JwtService } from "@nestjs/jwt"
 import { ConfigService } from "@nestjs/config"
-import {
-  ConflictException,
-  InternalServerErrorException,
-  UnauthorizedException,
-} from "@nestjs/common"
+import { ConflictException, UnauthorizedException } from "@nestjs/common"
+import { Users } from "src/users/entities/users.entity"
 
 describe("AuthService", () => {
   let service: AuthService
@@ -87,7 +84,9 @@ describe("AuthService", () => {
 
     it("should return tokens if registration succeeds", async () => {
       usersService.userExists.mockResolvedValue(false)
-      usersService.insertUser.mockResolvedValue({ id: 1, username: "new" } as any)
+
+      const mockUser: Partial<Users> = { id: 1, username: "new" }
+      usersService.insertUser.mockResolvedValue(mockUser as Users)
       usersService.getUserByUsername.mockResolvedValue({
         id: 1,
         username: "new",

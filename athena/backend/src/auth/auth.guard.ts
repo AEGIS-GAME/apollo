@@ -10,6 +10,12 @@ import { ConfigService } from "@nestjs/config"
 import { Reflector } from "@nestjs/core"
 import { IS_PUBLIC_KEY } from "./decorators/public.decorator"
 
+interface JwtPayload {
+  sub: number
+  iat?: number
+  exp?: number
+}
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
@@ -18,6 +24,7 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector
   ) {}
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
@@ -28,7 +35,7 @@ export class AuthGuard implements CanActivate {
       return true
     }
 
-    const request = context.switchToHttp().getRequest()
+    const request = context.switchToHttp().getRequest<Request & { user?: JwtPayload }>()
     const token = this.extractTokenFromHeader(request)
 
     if (!token) {
@@ -37,8 +44,10 @@ export class AuthGuard implements CanActivate {
 
     try {
       const accessSecret = this.configService.get<string>("JWT_ACCESS_SECRET")
-      const payload = this.jwtService.verify(token, { secret: accessSecret })
-      request["user"] = payload
+      const payload = this.jwtService.verify<JwtPayload>(token, {
+        secret: accessSecret,
+      })
+      request.user = payload
     } catch {
       throw new UnauthorizedException("Invalid or expired token")
     }

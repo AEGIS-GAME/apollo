@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString, MinLength } from "class-validator"
 export class RegisterDto {
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }: { value: string }) => value.trim())
   readonly username!: string
 
   @IsString()
