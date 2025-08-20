@@ -9,7 +9,7 @@ export class TokenController {
   @Post("/refresh")
   refresh(@Request() req: { user: TokenDto }) {
     const userId = req.user.sub
-    return this.tokenService.generateAccessToken(userId)
+    return { access: this.tokenService.generateAccessToken(userId) }
   }
 
   @Post("/validate")
