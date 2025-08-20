@@ -33,11 +33,14 @@ describe("TokenController", () => {
   describe("refresh", () => {
     it("should call tokenService.generateAccessToken with the user ID", () => {
       const fakeUser: TokenDto = { sub: 42, iat: 1000, exp: 2000 }
-      tokenService.generateAccessToken.mockReturnValue("access-token")
+
+      const signSpy = jest
+        .spyOn(tokenService, "generateAccessToken")
+        .mockReturnValue("access-token")
 
       const result = controller.refresh({ user: fakeUser })
 
-      expect(tokenService.generateAccessToken).toHaveBeenCalledWith(42)
+      expect(signSpy).toHaveBeenCalledWith(42)
       expect(result).toBe("access-token")
     })
   })

@@ -29,13 +29,18 @@ describe("TokenService", () => {
     configService = module.get(ConfigService)
   })
 
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   it("generateAccessToken should call jwt.sign with correct args", () => {
-    configService.get.mockReturnValue("access-secret")
-    jwtService.sign.mockReturnValue("fake-access-token")
+    const getSpy = jest.spyOn(configService, "get").mockReturnValue("access-secret")
+    const signSpy = jest.spyOn(jwtService, "sign").mockReturnValue("fake-access-token")
 
     const token = service.generateAccessToken(42)
-    expect(configService.get).toHaveBeenCalledWith("JWT_ACCESS_SECRET")
-    expect(jwtService.sign).toHaveBeenCalledWith(
+
+    expect(getSpy).toHaveBeenCalledWith("JWT_ACCESS_SECRET")
+    expect(signSpy).toHaveBeenCalledWith(
       { sub: 42 },
       { secret: "access-secret", expiresIn: "15m" }
     )
@@ -43,12 +48,13 @@ describe("TokenService", () => {
   })
 
   it("generateRefreshToken should call jwt.sign with correct args", () => {
-    configService.get.mockReturnValue("refresh-secret")
-    jwtService.sign.mockReturnValue("fake-refresh-token")
+    const getSpy = jest.spyOn(configService, "get").mockReturnValue("refresh-secret")
+    const signSpy = jest.spyOn(jwtService, "sign").mockReturnValue("fake-refresh-token")
 
     const token = service.generateRefreshToken(42)
-    expect(configService.get).toHaveBeenCalledWith("JWT_REFRESH_SECRET")
-    expect(jwtService.sign).toHaveBeenCalledWith(
+
+    expect(getSpy).toHaveBeenCalledWith("JWT_REFRESH_SECRET")
+    expect(signSpy).toHaveBeenCalledWith(
       { sub: 42 },
       { secret: "refresh-secret", expiresIn: "7d" }
     )
