@@ -1,8 +1,9 @@
+import { TypeOrmModule } from "@nestjs/typeorm"
 import { Module } from "@nestjs/common"
 import { AuthModule } from "./auth/auth.module"
 import { ConfigModule } from "@nestjs/config"
 import { UsersModule } from "./users/users.module"
-import { TypeOrmModule } from "@nestjs/typeorm"
+import { TokenModule } from "./token/token.module"
 
 const isProd = process.env.NODE_ENV === "production"
 
@@ -10,6 +11,7 @@ const isProd = process.env.NODE_ENV === "production"
   imports: [
     AuthModule,
     UsersModule,
+    TokenModule,
     ConfigModule.forRoot({ cache: true }),
     TypeOrmModule.forRoot({
       type: isProd ? "postgres" : "sqlite",

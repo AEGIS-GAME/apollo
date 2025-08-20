@@ -2,14 +2,14 @@ import * as bcrypt from "bcrypt"
 import { Test, TestingModule } from "@nestjs/testing"
 import { AuthService } from "./auth.service"
 import { UsersService } from "../users/users.service"
-import { JwtService } from "@nestjs/jwt"
-import { ConfigService } from "@nestjs/config"
+import { Users } from "../users/entities/users.entity"
+import { TokenService } from "../token/token.service"
 import { ConflictException, UnauthorizedException } from "@nestjs/common"
-import { Users } from "src/users/entities/users.entity"
 
 describe("AuthService", () => {
   let service: AuthService
   let usersService: jest.Mocked<UsersService>
+  let tokenService: jest.Mocked<TokenService>
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -23,13 +23,18 @@ describe("AuthService", () => {
             insertUser: jest.fn(),
           },
         },
-        { provide: JwtService, useValue: { sign: jest.fn() } },
-        { provide: ConfigService, useValue: { get: jest.fn() } },
+        {
+          provide: TokenService,
+          useValue: {
+            generateTokenPair: jest.fn(),
+          },
+        },
       ],
     }).compile()
 
     service = module.get<AuthService>(AuthService)
     usersService = module.get(UsersService)
+    tokenService = module.get(TokenService)
   })
 
   describe("login", () => {
@@ -62,7 +67,7 @@ describe("AuthService", () => {
       }
       usersService.getUserByUsername.mockResolvedValue(user)
 
-      jest.spyOn(service, "generateTokens").mockReturnValue({
+      tokenService.generateTokenPair.mockReturnValue({
         access: "fake-access",
         refresh: "fake-refresh",
       })
@@ -93,10 +98,11 @@ describe("AuthService", () => {
         password: "hashed",
       })
 
-      jest.spyOn(service, "generateTokens").mockReturnValue({
+      tokenService.generateTokenPair.mockReturnValue({
         access: "fake-access",
         refresh: "fake-refresh",
       })
+
       const result = await service.register("new", "pass")
       expect(result).toEqual({
         access: "fake-access",

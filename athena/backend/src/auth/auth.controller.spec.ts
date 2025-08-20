@@ -3,24 +3,28 @@ import { AuthController } from "./auth.controller"
 import { AuthService } from "./auth.service"
 import { LoginDto } from "./dto/login.dto"
 import { RegisterDto } from "./dto/register.dto"
-import { TokenPairDto } from "./dto/token-pair.dto"
+import { TokenPairDto } from "../token/dto/token-pair.dto"
 
 describe("AuthController", () => {
   let controller: AuthController
-  let authService: Partial<AuthService>
+  let authService: jest.Mocked<AuthService>
 
   beforeEach(async () => {
-    authService = {
-      login: jest.fn(),
-      register: jest.fn(),
-    }
-
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [{ provide: AuthService, useValue: authService }],
+      providers: [
+        {
+          provide: AuthService,
+          useValue: {
+            login: jest.fn(),
+            register: jest.fn(),
+          },
+        },
+      ],
     }).compile()
 
     controller = module.get<AuthController>(AuthController)
+    authService = module.get(AuthService)
   })
 
   describe("login", () => {
@@ -28,11 +32,12 @@ describe("AuthController", () => {
       const dto: LoginDto = { username: "user", password: "pass" }
       const tokens: TokenPairDto = { access: "a", refresh: "b" }
 
-      ;(authService.login as jest.Mock).mockResolvedValue(tokens)
+      authService.login.mockResolvedValue(tokens)
+      const spy = jest.spyOn(authService, "login")
 
       const result = await controller.login(dto)
 
-      expect(authService.login).toHaveBeenCalledWith("user", "pass")
+      expect(spy).toHaveBeenCalledWith("user", "pass")
       expect(result).toEqual(tokens)
     })
   })
@@ -42,11 +47,12 @@ describe("AuthController", () => {
       const dto: RegisterDto = { username: "new", password: "pass" }
       const tokens: TokenPairDto = { access: "x", refresh: "y" }
 
-      ;(authService.register as jest.Mock).mockResolvedValue(tokens)
+      authService.register.mockResolvedValue(tokens)
+      const spy = jest.spyOn(authService, "register")
 
       const result = await controller.register(dto)
 
-      expect(authService.register).toHaveBeenCalledWith("new", "pass")
+      expect(spy).toHaveBeenCalledWith("new", "pass")
       expect(result).toEqual(tokens)
     })
   })

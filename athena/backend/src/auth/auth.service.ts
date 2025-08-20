@@ -1,16 +1,14 @@
 import * as bcrypt from "bcrypt"
 import { ConflictException, Injectable, UnauthorizedException } from "@nestjs/common"
 import { UsersService } from "../users/users.service"
-import { JwtService } from "@nestjs/jwt"
-import { ConfigService } from "@nestjs/config"
-import { TokenPairDto } from "./dto/token-pair.dto"
+import { TokenService } from "../token/token.service"
+import { TokenPairDto } from "../token/dto/token-pair.dto"
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
+    private readonly tokenService: TokenService
   ) {}
 
   async login(username: string, password: string): Promise<TokenPairDto> {
@@ -23,7 +21,7 @@ export class AuthService {
       throw new UnauthorizedException()
     }
 
-    return this.generateTokens(user.id)
+    return this.tokenService.generateTokenPair(user.id)
   }
 
   async register(username: string, password: string): Promise<TokenPairDto> {
@@ -37,29 +35,6 @@ export class AuthService {
       admin: false,
     })
 
-    return this.generateTokens(user.id)
-  }
-
-  generateTokens(userId: number): TokenPairDto {
-    const accessSecret = this.configService.get<string>("JWT_ACCESS_SECRET")
-    const refreshSecret = this.configService.get<string>("JWT_REFRESH_SECRET")
-
-    const access = this.jwtService.sign(
-      { sub: userId },
-      {
-        secret: accessSecret,
-        expiresIn: "15m",
-      }
-    )
-
-    const refresh = this.jwtService.sign(
-      { sub: userId },
-      {
-        secret: refreshSecret,
-        expiresIn: "7d",
-      }
-    )
-
-    return { access, refresh }
+    return this.tokenService.generateTokenPair(user.id)
   }
 }
